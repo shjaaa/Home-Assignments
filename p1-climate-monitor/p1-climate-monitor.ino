@@ -102,6 +102,46 @@ void loop() {
       digitalWrite(RED_LED, LOW);
       digitalWrite(GREEN_LED, HIGH);
     }
+    //For my case
+     // ---------- STATUS LOGIC ----------
+//     if (temp >= 36.8|| hum > 80) {
+
+//     status = "DANGER";
+//     digitalWrite(RED_LED, HIGH);
+//     digitalWrite(GREEN_LED, LOW);
+//     digitalWrite(BUZZER, HIGH);
+//     delay(10000);
+//     digitalWrite(BUZZER, LOW);
+
+
+// }
+// else if (temp >= 36|| hum > 70) {
+
+//     status = "HOT";
+//     status = "HOT";
+//     digitalWrite(RED_LED, LOW);
+//     digitalWrite(GREEN_LED, HIGH);
+//     digitalWrite(BUZZER, LOW);
+
+// }
+// else if (temp >= 35.6) {
+
+//     status = "COMFORT";
+//     digitalWrite(RED_LED, LOW);
+//     digitalWrite(GREEN_LED, HIGH);
+//     digitalWrite(BUZZER, LOW);
+
+// }
+// else if(temp<=35.6) {
+
+//     status = "COOL";
+//     digitalWrite(RED_LED, LOW);
+//     digitalWrite(GREEN_LED, HIGH);
+//     digitalWrite(BUZZER, LOW);
+
+
+// }
+
 
     // OLED Display
     display.clearDisplay();
