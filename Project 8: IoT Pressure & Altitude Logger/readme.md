@@ -1,124 +1,221 @@
-IoT Pressure & Altitude Logger using ESP32
-Overview
+# IoT Pressure & Altitude Logger (Simulation)
 
-This project implements an IoT Pressure & Altitude Logger using an ESP32, BMP180 pressure sensor (used in place of BMP280 for simulation), OLED display, potentiometer, and LEDs. The system continuously measures atmospheric pressure and temperature, simulates local altitude using a potentiometer, calculates sea-level pressure, stores the last 24 pressure readings in a circular buffer, determines the weather trend (RISING, FALLING, or STABLE), and displays the information on a 0.96" OLED display. The OLED alternates between sensor readings and weather trend every 5 seconds. The project also provides real-time monitoring through the Serial Monitor and visual status indication using LEDs.
+## Project Overview
 
-Features
-Atmospheric pressure measurement using BMP180
-Temperature monitoring
-Altitude simulation using a potentiometer (0–2000 m)
-Sea-level pressure calculation
-Circular buffer storing the last 24 pressure readings
-Weather trend detection (RISING, FALLING, STABLE)
-Automatic OLED page switching every 5 seconds
-Green LED for Rising/Stable trend
-Red LED for Falling trend
-Serial Monitor output every 30 seconds
-I2C communication between ESP32, BMP180, and OLED
-Components Used
-ESP32 DevKit V1
-BMP180 Pressure Sensor (BMP280 substituted with BMP180 in Wokwi)
-OLED Display 0.96" SSD1306 (I2C)
-10kΩ Potentiometer
-Green LED
-Red LED
-220Ω Resistors ×2
-Breadboard
-Jumper Wires
-Circuit Connections
-BMP180
-BMP180 Pin	ESP32 Pin
-VCC	3.3V
-GND	GND
-SDA	GPIO21
-SCL	GPIO22
-OLED Display
-OLED Pin	ESP32 Pin
-VCC	3.3V
-GND	GND
-SDA	GPIO21
-SCL	GPIO22
-Potentiometer
-Potentiometer	ESP32
-VCC	3.3V
-GND	GND
-SIG	GPIO34
-LEDs
-Component	ESP32 Pin
-Green LED	GPIO25
-Red LED	GPIO26
-Working Principle
-The ESP32 reads pressure and temperature from the BMP180 sensor every 30 seconds.
-The potentiometer is used to simulate local altitude between 0 and 2000 meters.
-Sea-level pressure is calculated using the standard atmospheric formula.
-Each pressure reading is stored in a circular buffer containing the latest 24 readings.
-The newest pressure is compared with the oldest stored reading to determine the weather trend:
-Rising
-Falling
-Stable
-The OLED alternates every 5 seconds between:
-Pressure, Temperature and Altitude
+This project demonstrates an IoT-based Pressure & Weather Trend Logger using an ESP32. Since the BMP280 pressure sensor and potentiometer were not available, atmospheric pressure values are simulated while temperature and humidity are measured using a DHT11 sensor.
+
+The system displays environmental data on an OLED display, stores pressure readings in a circular buffer, predicts weather trends based on pressure changes, and indicates the trend using LEDs.
+
+---
+
+## Features
+
+- Simulated Atmospheric Pressure (hPa)
+- Real Temperature Monitoring using DHT11
+- Real Humidity Monitoring using DHT11
+- Circular Buffer (24 Pressure Readings)
+- Pressure Trend Detection
+  - Rising
+  - Falling
+  - Stable
+- OLED Display (2 Pages)
+- Green and Red LED Status Indicators
+- Serial Monitor Data Logging
+
+---
+
+## Components Used
+
+| Component | Quantity |
+|-----------|----------|
+| ESP32 Dev Board | 1 |
+| DHT11 Temperature & Humidity Sensor | 1 |
+| OLED Display 0.96" SSD1306 | 1 |
+| Green LED | 1 |
+| Red LED | 1 |
+| 220Ω Resistors | 2 |
+| Breadboard | 1 |
+| Jumper Wires | As Required |
+
+---
+
+## Circuit Connections
+
+### OLED Display
+
+| OLED | ESP32 |
+|------|-------|
+| VCC | 3.3V |
+| GND | GND |
+| SDA | GPIO21 |
+| SCL | GPIO22 |
+
+### DHT11
+
+| DHT11 | ESP32 |
+|--------|-------|
+| VCC | 3.3V |
+| GND | GND |
+| DATA | GPIO4 |
+
+### LEDs
+
+| LED | ESP32 |
+|-----|-------|
+| Green LED | GPIO25 |
+| Red LED | GPIO26 |
+
+---
+
+## Working Principle
+
+1. ESP32 reads temperature and humidity from the DHT11 sensor.
+2. Pressure values are simulated to imitate a BMP280 sensor.
+3. Every reading is stored inside a 24-element circular buffer.
+4. The newest pressure value is compared with previous values.
+5. Weather trend is calculated:
+   - Rising Pressure → Good Weather
+   - Falling Pressure → Rain Likely
+   - Stable Pressure → Normal Weather
+6. OLED alternates between:
+   - Environmental Data
+   - Weather Trend
+7. LEDs indicate the current trend:
+   - Green → Rising/Stable
+   - Red → Falling
+
+---
+
+## Pressure Trend Logic
+
+```
+Difference > +0.2 hPa
+→ Rising
+
+Difference < -0.2 hPa
+→ Falling
+
+Otherwise
+→ Stable
+```
+
+---
+
+## Circular Buffer
+
+The last 24 pressure readings are stored in an array.
+
+```
+pressureLog[24]
+```
+
+When the array becomes full, the oldest value is automatically replaced by the newest reading.
+
+---
+
+## OLED Pages
+
+### Page 1
+
+```
+Pressure Logger
+
+Pressure : 1013.5 hPa
+Temp     : 31.8 C
+Humidity : 64%
+```
+
+### Page 2
+
+```
 Weather Trend
-LEDs indicate the current weather trend.
-All sensor readings are printed to the Serial Monitor.
-Pressure Trend Logic
-Pressure Difference	Trend
-Greater than +0.5 hPa	RISING
-Less than -0.5 hPa	FALLING
-Between -0.5 and +0.5 hPa	STABLE
-Sea-Level Pressure Formula
 
-The sea-level pressure is calculated using the standard atmospheric equation:
+↑ Rising
+```
 
-P₀ = P / (1 - h / 44330) ^ 5.255
+or
+
+```
+↓ Falling
+```
+
+or
+
+```
+→ Stable
+```
+
+---
+
+## Serial Monitor Output
+
+```
+-------------------------------------
+Pressure    : 1014.3 hPa
+Temperature : 31.5 C
+Humidity    : 62 %
+Trend       : RISING
+-------------------------------------
+```
+
+---
+
+## Sea-Level Pressure Formula
+
+The original BMP280 project uses the following equation to calculate sea-level pressure:
+
+```
+P₀ = P / (1 - altitude / 44330)^5.255
+```
 
 Where:
 
-P₀ = Sea-level pressure (hPa)
-P = Measured pressure (hPa)
-h = Altitude (meters)
+- **P₀** = Sea-level pressure
+- **P** = Measured atmospheric pressure
+- **Altitude** = Height above sea level
 
-This compensates for altitude differences and allows pressure readings from different locations to be compared.
+Higher altitudes result in lower atmospheric pressure. Converting measured pressure to sea-level pressure allows readings from different locations to be compared accurately.
 
-OLED Display
-Screen 1
-Pressure (hPa)
-Temperature (°C)
-Altitude (m)
-Screen 2
-Weather Trend
-↑ Rising
-↓ Falling
-→ Stable
+In this modified project, altitude and pressure are simulated because a BMP280 sensor and potentiometer were unavailable.
 
-The display automatically switches between both screens every 5 seconds.
+---
 
-Serial Monitor Output
---------------------------------------
-Pressure      : 1008.45 hPa
-Temperature   : 28.6 °C
-Altitude      : 850 m
-Sea Level Pressure : 1116.32 hPa
-Trend         : RISING
---------------------------------------
-Project Structure
+## Limitations
+
+- No BMP280 sensor available.
+- Pressure values are simulated.
+- Altitude is not measured.
+- Sea-level pressure is demonstrated conceptually.
+
+---
+
+## Future Improvements
+
+- Replace simulated pressure with a BMP280 sensor.
+- Add altitude compensation using a potentiometer.
+- Store readings on an SD card.
+- Publish readings using MQTT.
+- Display pressure graphs on a web dashboard.
+- Add Wi-Fi-based remote monitoring.
+
+---
+
+## Folder Structure
+
+```
 p8-pressure-logger/
-│── sketch.ino
-│── README.md
-Wokwi Simulation
+│
+├── Pressure_Logger_Simulator.ino
+├── README.md
 
-This project was simulated using Wokwi. Since BMP280 was unavailable in Wokwi, the BMP180 sensor was used as a compatible alternative. The potentiometer simulates local altitude for demonstrating sea-level pressure compensation and trend analysis.
 
-Future Improvements
-MQTT publishing to HiveMQ
-SD card data logging
-Cloud dashboard integration
-Pressure graph visualization
-Weather forecast based on long-term pressure trends
-Web dashboard using ESP32 Wi-Fi
-Author
+---
 
-Shobhit Singh
-Jaypee Institute of Information Technology (JIIT), Noida
-ECE Department
-Summer School 2026 – IIT Jammu IoT Home Assignments
+## Author
+
+**Shobhit Singh**
+
+
+ESP32 IoT Summer Training Project
+
+2026
