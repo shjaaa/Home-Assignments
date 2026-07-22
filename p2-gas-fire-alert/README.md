@@ -108,17 +108,7 @@ Wokwi does not currently provide a flame sensor component. A slide switch was us
 p2-gas-fire-alert/
 │── Gas_Fire_Alert.ino
 │── README.md
-│── wokwi-project.json
-│── diagram.json
-│── images/
-│     ├── circuit.png
-│     ├── safe.png
-│     ├── warning.png
-│     ├── gas-danger.png
-│     ├── fire-danger.png
-│     ├── gas-fire-danger.png
-│── demo.mp4
-```
+projectlink
 
 ---
 
